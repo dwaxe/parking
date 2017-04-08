@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Reserve a spot{% endblock %}
+{% block reservations %}active{% endblock %}
+
+
+{% block body %}
+<div class="row">
+    <div class="col-sm-offset-2">
+<h2>{{ spot.address }}</h2>
+<h3>{{ spot }} </h3>
+<h4>Cost per hour: ${{ spot.cost }}</h4>
+    </div>
+</div>
+
+<form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+{% for field in form %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <span class="text-danger small">{{ field.errors }}</span>
+        </div>
+        <label class="control-label col-sm-2" for="reserve_until">Reserve until</label>
+        <div class="col-sm-10">{{ field }}</div>
+    </div>
+{% endfor %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+    </div>
+
+</form>
+    <a href="delete" class="btn btn-danger col-sm-offset-2" role="button">Delete Reservation</a>
+
+{% endblock %}

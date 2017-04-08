@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}All Spots{% endblock %}
+{% block map_active %}active{% endblock %}
+
+{% block body %}
+<div class="container-fluid songs-container">
+
+<div class=row style="height:400px;">
+    <div id="floating-panel">
+      <input id="address" type="textbox" value="Berkeley">
+      <input id="submit" type="button" value="Center Map">
+    </div>
+
+    <div id="map"></div>
+</div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Reserved Until</th>
+                                <th>Current Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for spot in spots %}
+                            
+                                <tr>
+                                    <td>{{ spot.address }}</td>
+                                    <td>{{ spot.lat }}</td>
+                                    <td>{{ spot.lng }}</td>
+                                    <td><a href="{{ spot.id }}">{{ spot.reserved_until }}</a></td>
+                                    <td>{{ spot.reservation_owner }}</td>
+                                </tr>
+                            
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+    <script>
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 16,
+          center: {lat: 37.8719, lng: -122.2585}
+        });
+        
+        {% for spot in spots %}
+        marker = new google.maps.Marker({
+              map: map,
+              position: {lat: {{ spot.lat }}, lng: {{ spot.lng }}},
+              label: {% if spot.reservation_owner %} 'R' {% else %} 'P' {% endif %},
+              url: {{ spot.id }}
+            });
+        google.maps.event.addListener(marker, 'click', function() { window.location.href = this.url; });
+        {% endfor %}
+        var geocoder = new google.maps.Geocoder();
+
+        document.getElementById('submit').addEventListener('click', function() {
+          geocodeAddress(geocoder, map);
+        });
+      }
+
+      function geocodeAddress(geocoder, resultsMap) {
+        var address = document.getElementById('address').value;
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+            
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsdL5hFsuxorU1K3ArJcyucgAE2OHt3V0&callback=initMap">
+    </script>
+
+
+{% endblock %}
